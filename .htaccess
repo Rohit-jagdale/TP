@@ -1,0 +1,33 @@
+# PHP Blog - Apache Configuration
+# Enable rewrite engine for clean URLs (optional)
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # Redirect .html to .php (optional)
+    # RewriteRule ^index\.html$ index.php [L,R=301]
+    # RewriteRule ^posts\.html$ posts.php [L,R=301]
+    
+    # Clean URLs for single posts (optional)
+    # RewriteRule ^post/([a-z0-9-]+)/?$ single-post.php?slug=$1 [L,QSA]
+</IfModule>
+
+# Security: Prevent directory browsing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "^(config|database|functions)\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Set default charset
+AddDefaultCharset UTF-8
+
+# PHP settings (if allowed)
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+</IfModule>
+
