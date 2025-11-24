@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: php-blog-web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./uploads:/var/www/html/uploads
+      - .:/var/www/html
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=dpg-d4i47qgdl3ps73a41m80-a
+      - DB_NAME=tp_db_oma0
+      - DB_USER=tp_db_oma0_user
+      - DB_PASS=6m85FMtfucXKBlg4D05IUUrySBxInASD
+      - DB_TYPE=pgsql
+      - DB_PORT=5432
+    networks:
+      - blog-network
+
+  db:
+    image: postgres:15
+    container_name: php-blog-db
+    environment:
+      POSTGRES_DB: tp_db_oma0
+      POSTGRES_USER: tp_db_oma0_user
+      POSTGRES_PASSWORD: 6m85FMtfucXKBlg4D05IUUrySBxInASD
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./database/schema-postgres.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - blog-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: php-blog-pgadmin
+    ports:
+      - "8081:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@blog.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - db
+    networks:
+      - blog-network
+
+networks:
+  blog-network:
+    driver: bridge
+
+volumes:
+  db_data:
+

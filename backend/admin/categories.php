@@ -7,6 +7,10 @@ require_once __DIR__ . '/../includes/functions.php';
 requireLogin();
 
 $pdo = getDBConnection();
+if (!$pdo) {
+    die('Database connection failed. Please check your database configuration.');
+}
+
 $message = '';
 $messageType = '';
 

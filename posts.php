@@ -18,8 +18,13 @@ if ($categorySlug) {
     $posts = array_slice($allPosts, $offset, $perPage);
 } else {
     $pdo = getDBConnection();
-    $totalPosts = $pdo->query("SELECT COUNT(*) FROM posts WHERE status = 'published'")->fetchColumn();
-    $posts = getPosts('published', $perPage, $offset);
+    if ($pdo) {
+        $totalPosts = $pdo->query("SELECT COUNT(*) FROM posts WHERE status = 'published'")->fetchColumn();
+        $posts = getPosts('published', $perPage, $offset);
+    } else {
+        $totalPosts = 0;
+        $posts = [];
+    }
 }
 
 $totalPages = ceil($totalPosts / $perPage);

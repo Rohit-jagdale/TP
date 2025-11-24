@@ -8,6 +8,10 @@ requireLogin();
 
 $pdo = getDBConnection();
 
+if (!$pdo) {
+    die('Database connection failed. Please check your database configuration.');
+}
+
 // Get statistics
 $totalPosts = $pdo->query("SELECT COUNT(*) FROM posts")->fetchColumn();
 $publishedPosts = $pdo->query("SELECT COUNT(*) FROM posts WHERE status = 'published'")->fetchColumn();
