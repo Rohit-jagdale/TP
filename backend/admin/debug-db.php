@@ -12,14 +12,38 @@ header('Content-Type: text/plain');
 
 echo "=== Database Configuration Debug ===\n\n";
 
+// Helper function to check env vars from multiple sources
+function checkEnvVar($key) {
+    $value = getenv($key);
+    if ($value !== false) return $value;
+    if (isset($_ENV[$key]) && $_ENV[$key] !== '') return $_ENV[$key];
+    if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') return $_SERVER[$key];
+    return null;
+}
+
 echo "Environment Variables:\n";
-echo "DB_HOST: " . (getenv('DB_HOST') ?: 'NOT SET (using default: ' . DB_HOST . ')') . "\n";
-echo "DB_NAME: " . (getenv('DB_NAME') ?: 'NOT SET (using default: ' . DB_NAME . ')') . "\n";
-echo "DB_USER: " . (getenv('DB_USER') ?: 'NOT SET (using default: ' . DB_USER . ')') . "\n";
-echo "DB_PASS: " . (getenv('DB_PASS') ? '***SET***' : 'NOT SET (using default)') . "\n";
-echo "DB_TYPE: " . (getenv('DB_TYPE') ?: 'NOT SET (auto-detected: ' . DB_TYPE . ')') . "\n";
-echo "DB_PORT: " . (getenv('DB_PORT') ?: 'NOT SET') . "\n";
-echo "DB_CHARSET: " . (getenv('DB_CHARSET') ?: 'NOT SET (using default: ' . DB_CHARSET . ')') . "\n\n";
+$dbHostEnv = checkEnvVar('DB_HOST');
+echo "DB_HOST: " . ($dbHostEnv ?: 'NOT SET (using default: ' . DB_HOST . ')') . "\n";
+$dbNameEnv = checkEnvVar('DB_NAME');
+echo "DB_NAME: " . ($dbNameEnv ?: 'NOT SET (using default: ' . DB_NAME . ')') . "\n";
+$dbUserEnv = checkEnvVar('DB_USER');
+echo "DB_USER: " . ($dbUserEnv ?: 'NOT SET (using default: ' . DB_USER . ')') . "\n";
+$dbPassEnv = checkEnvVar('DB_PASS');
+echo "DB_PASS: " . ($dbPassEnv ? '***SET***' : 'NOT SET (using default)') . "\n";
+$dbTypeEnv = checkEnvVar('DB_TYPE');
+echo "DB_TYPE: " . ($dbTypeEnv ?: 'NOT SET (auto-detected: ' . DB_TYPE . ')') . "\n";
+$dbPortEnv = checkEnvVar('DB_PORT');
+echo "DB_PORT: " . ($dbPortEnv ?: 'NOT SET') . "\n";
+$dbCharsetEnv = checkEnvVar('DB_CHARSET');
+echo "DB_CHARSET: " . ($dbCharsetEnv ?: 'NOT SET (using default: ' . DB_CHARSET . ')') . "\n\n";
+
+echo "All Environment Variables (from \$_ENV):\n";
+foreach ($_ENV as $key => $value) {
+    if (strpos($key, 'DB_') === 0) {
+        echo "  $_ENV[$key] = " . (strpos($key, 'PASS') !== false ? '***' : $value) . "\n";
+    }
+}
+echo "\n";
 
 echo "Detected Configuration:\n";
 echo "DB_HOST: " . DB_HOST . "\n";

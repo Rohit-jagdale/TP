@@ -5,18 +5,42 @@
  * Supports both MySQL and PostgreSQL
  */
 
+/**
+ * Get environment variable from multiple sources (getenv, $_ENV, $_SERVER)
+ * This ensures compatibility with different PHP configurations
+ */
+function getEnvVar($key, $default = null) {
+    // Try getenv() first
+    $value = getenv($key);
+    if ($value !== false) {
+        return $value;
+    }
+    
+    // Try $_ENV
+    if (isset($_ENV[$key]) && $_ENV[$key] !== '') {
+        return $_ENV[$key];
+    }
+    
+    // Try $_SERVER
+    if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') {
+        return $_SERVER[$key];
+    }
+    
+    return $default;
+}
+
 // Database credentials - use environment variables if available (for Docker/Render), otherwise use defaults
-define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
-define('DB_NAME', getenv('DB_NAME') ?: 'blog_db');
-define('DB_USER', getenv('DB_USER') ?: 'root');
-define('DB_PASS', getenv('DB_PASS') ?: '64276629');
-define('DB_CHARSET', getenv('DB_CHARSET') ?: 'utf8mb4');
+define('DB_HOST', getEnvVar('DB_HOST', 'localhost'));
+define('DB_NAME', getEnvVar('DB_NAME', 'blog_db'));
+define('DB_USER', getEnvVar('DB_USER', 'root'));
+define('DB_PASS', getEnvVar('DB_PASS', '64276629'));
+define('DB_CHARSET', getEnvVar('DB_CHARSET', 'utf8mb4'));
 
 // Database type: 'mysql' or 'pgsql' (PostgreSQL)
 // Auto-detect from DB_HOST if it contains 'postgres' or 'postgresql', or starts with 'dpg-' (Render PostgreSQL)
 // Otherwise default to mysql
 $dbHostLower = strtolower(DB_HOST);
-$envDbType = getenv('DB_TYPE');
+$envDbType = getEnvVar('DB_TYPE');
 if ($envDbType) {
     define('DB_TYPE', $envDbType);
 } elseif (strpos($dbHostLower, 'postgres') !== false || strpos($dbHostLower, 'dpg-') === 0) {
@@ -39,7 +63,7 @@ function getDBConnection() {
                 // PostgreSQL connection
                 $dsn = "pgsql:host=" . DB_HOST . ";dbname=" . DB_NAME;
                 // PostgreSQL uses port in connection string if provided
-                $port = getenv('DB_PORT') ?: '5432';
+                $port = getEnvVar('DB_PORT', '5432');
                 $dsn .= ";port=" . $port;
             } else {
                 // MySQL connection
