@@ -12,38 +12,38 @@ services:
     depends_on:
       - db
     environment:
-      - DB_HOST=db
-      - DB_NAME=blog_db
-      - DB_USER=blog_user
-      - DB_PASS=blog_password
+      - DB_HOST=dpg-d4i47qgdl3ps73a41m80-a
+      - DB_NAME=tp_db_oma0
+      - DB_USER=tp_db_oma0_user
+      - DB_PASS=6m85FMtfucXKBlg4D05IUUrySBxInASD
+      - DB_TYPE=pgsql
+      - DB_PORT=5432
     networks:
       - blog-network
 
   db:
-    image: mysql:8.0
+    image: postgres:15
     container_name: php-blog-db
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: blog_db
-      MYSQL_USER: blog_user
-      MYSQL_PASSWORD: blog_password
+      POSTGRES_DB: tp_db_oma0
+      POSTGRES_USER: tp_db_oma0_user
+      POSTGRES_PASSWORD: 6m85FMtfucXKBlg4D05IUUrySBxInASD
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - db_data:/var/lib/mysql
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - db_data:/var/lib/postgresql/data
+      - ./database/schema-postgres.sql:/docker-entrypoint-initdb.d/schema.sql
     networks:
       - blog-network
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: php-blog-phpmyadmin
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: php-blog-pgadmin
     ports:
       - "8081:80"
     environment:
-      PMA_HOST: db
-      PMA_USER: blog_user
-      PMA_PASSWORD: blog_password
+      PGADMIN_DEFAULT_EMAIL: admin@blog.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     depends_on:
       - db
     networks:
