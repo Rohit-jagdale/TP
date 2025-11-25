@@ -53,17 +53,18 @@ $categories = getCategories();
             <div class="inner-header">
 
                 <div class="top-bar">
-                    <div class="tob-bar-category-text">Tech</div>
+                    <div class="tob-bar-category-text">Blog</div>
                     <div class="tech-cateogry-moving-section">
                         <div class="moving-tech-list-wrapper w-dyn-list">
                             <div role="list" class="moving-tech-list w-dyn-items">
                                 <?php 
                                 $recentPosts = getPosts('published', 6);
                                 foreach ($recentPosts as $recentPost): 
+                                    $featuredImage = !empty($recentPost['featured_image']) ? $recentPost['featured_image'] : 'post1.webp';
                                 ?>
                                 <div role="listitem" class="w-dyn-item">
                                     <a href="single-post.php?slug=<?php echo escape($recentPost['slug']); ?>" class="moving-tech-item w-inline-block">
-                                        <img src="post1.webp" loading="lazy" width="20" alt="" class="comment-icon" />
+                                        <img src="<?php echo escape($featuredImage); ?>" loading="lazy" width="20" alt="<?php echo escape($recentPost['title']); ?>" class="comment-icon" />
                                         <div class="moving-tech-text"><?php echo escape($recentPost['title']); ?></div>
                                     </a>
                                 </div>
@@ -110,31 +111,32 @@ $categories = getCategories();
                                 $readTime = ceil(str_word_count(strip_tags($post['content'])) / 200); // Approximate reading time
                             ?>
                             <div role="listitem" class="w-dyn-item">
-                                <div data-w-id="1b3f3cd6-09ce-1f4e-e361-71a9f11e93a8" class="top-blog-item">
-                                    <a href="single-post.php?slug=<?php echo escape($post['slug']); ?>" class="top-blog-img-wrapper w-inline-block">
-                                        <img src="<?php echo escape($featuredImage); ?>" alt="<?php echo escape($post['title']); ?>" class="top-blog-img" />
-                                        <img src="imgdd.jpg" loading="lazy" width="143" alt="" class="tob-blog-line" />
-                                    </a>
-                                    <div class="top-blog-content">
-                                        <h2 class="top-blog-title"><?php echo escape($post['title']); ?></h2>
-                                        <div class="top-blog-time-box">
-                                            <div class="post-time-text"><?php echo formatDate($post['created_at'], 'F j, Y'); ?></div>
-                                            <div class="post-time-text"><?php echo $readTime; ?> min Read</div>
+                                <a href="single-post.php?slug=<?php echo escape($post['slug']); ?>" class="top-blog-item-link">
+                                    <div data-w-id="1b3f3cd6-09ce-1f4e-e361-71a9f11e93a8" class="top-blog-item">
+                                        <div class="top-blog-img-wrapper">
+                                            <img src="<?php echo escape($featuredImage); ?>" alt="<?php echo escape($post['title']); ?>" class="top-blog-img" />
                                         </div>
-                                        <div class="top-blog-read-box">
-                                            <img src="imgdd.jpg" loading="lazy" width="55" alt="" class="top-blog-left-arrow" />
-                                            <a href="single-post.php?slug=<?php echo escape($post['slug']); ?>" class="read-more w-inline-block">
-                                                <div class="read-more-text">Read post</div>
-                                                <div class="arrow">
-                                                    <img src="arrow.png" loading="lazy" width="34" alt="" />
+                                        <div class="top-blog-content">
+                                            <h2 class="top-blog-title"><?php echo escape($post['title']); ?></h2>
+                                            <div class="top-blog-time-box">
+                                                <div class="post-time-text"><?php echo formatDate($post['created_at'], 'F j, Y'); ?></div>
+                                                <div class="post-time-text"><?php echo $readTime; ?> min Read</div>
+                                            </div>
+                                            <div class="top-blog-read-box">
+                                                <img src="imgdd.jpg" loading="lazy" width="55" alt="" class="top-blog-left-arrow" />
+                                                <div class="read-more">
+                                                    <div class="read-more-text">Read post</div>
+                                                    <div class="arrow">
+                                                        <img src="arrow.png" loading="lazy" width="34" alt="" />
+                                                    </div>
                                                 </div>
-                                            </a>
+                                            </div>
                                         </div>
+                                        <?php if ($primaryCategory): ?>
+                                        <a href="posts.php?category=<?php echo escape($primaryCategory['slug']); ?>" class="top-blog-category" onclick="event.stopPropagation();"><?php echo escape($primaryCategory['name']); ?></a>
+                                        <?php endif; ?>
                                     </div>
-                                    <?php if ($primaryCategory): ?>
-                                    <a href="posts.php?category=<?php echo escape($primaryCategory['slug']); ?>" class="top-blog-category"><?php echo escape($primaryCategory['name']); ?></a>
-                                    <?php endif; ?>
-                                </div>
+                                </a>
                             </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -169,30 +171,26 @@ $categories = getCategories();
         <div class="footer">
             <div class="w-layout-blockcontainer main-container w-container">
                 <div class="inner-footer">
-                    <div id="w-node-_309588e7-d5f0-871f-0289-459e178d6ab7-178d6ab4" data-w-id="309588e7-d5f0-871f-0289-459e178d6ab7" class="social-footer" style="opacity: 0;">
+                    <div id="w-node-_309588e7-d5f0-871f-0289-459e178d6ab7-178d6ab4" data-w-id="309588e7-d5f0-871f-0289-459e178d6ab7" class="social-footer">
                         <div class="social-inner">
                             <a id="w-node-_309588e7-d5f0-871f-0289-459e178d6ab9-178d6ab4" href="http://www.themeforest.com" target="_blank" class="social-item w-inline-block">
-                                <img src="imgdd.jpg" loading="lazy" width="48" alt="" class="social-icon" />
+                                <img src="facebook-logo.jpeg" loading="lazy" width="48" alt="Facebook" class="social-icon" />
                                 <div class="social-text">facebook</div>
                             </a>
                             <a id="w-node-_309588e7-d5f0-871f-0289-459e178d6abd-178d6ab4" href="http://www.themeforest.com" target="_blank" class="social-item w-inline-block">
-                                <img src="imgdd.jpg" loading="lazy" width="48" alt="" class="social-icon" />
+                                <img src="x-logo.jpg" loading="lazy" width="48" alt="X (Twitter)" class="social-icon" />
                                 <div class="social-text">twitter</div>
                             </a>
                             <a id="w-node-_309588e7-d5f0-871f-0289-459e178d6ac1-178d6ab4" href="http://www.themeforest.com" target="_blank" class="social-item w-inline-block">
-                                <img src="imgdd.jpg" loading="lazy" width="48" alt="" class="social-icon" />
+                                <img src="insta-logo.avif" loading="lazy" width="48" alt="Instagram" class="social-icon" />
                                 <div class="social-text">instagram</div>
-                            </a>
-                            <a id="w-node-_309588e7-d5f0-871f-0289-459e178d6ac5-178d6ab4" href="http://www.themeforest.com" target="_blank" class="social-item w-inline-block">
-                                <img src="imgdd.jpg" loading="lazy" width="48" alt="" class="social-icon" />
-                                <div class="social-text">yotube</div>
                             </a>
                         </div>
                     </div>
                 </div>
-                <div data-w-id="309588e7-d5f0-871f-0289-459e178d6ac9" class="copyright" style="opacity: 0;">
+                <div data-w-id="309588e7-d5f0-871f-0289-459e178d6ac9" class="copyright">
                     <div class="copyright-text">
-                        Designed by <a href="https://themeforest.net/user/max-themes" target="_blank" class="copyright-text">MaxThemes</a>
+                        Designed by <a href="https://themeforest.net/user/max-themes" target="_blank" class="copyright-text">JD</a>
                     </div>
                     <div class="copyright-rightside">
                         <a href="#" class="copyright-text license-text">License</a>

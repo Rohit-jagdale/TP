@@ -118,11 +118,11 @@ $latestPosts = getPosts('published', 5);
                     <!-- social-container -->
                     <div class="social-container">
                         
-                        <a class="social-link facebook" href="#"></a>
-                        <a class="social-link twitter" href="#"></a>
+                        <a class="social-link facebook" href="#"><img src="facebook-logo.jpeg" alt="Facebook" style="width: 16px; height: 16px; object-fit: contain;"></a>
+                        <a class="social-link twitter" href="#"><img src="x-logo.jpg" alt="X (Twitter)" style="width: 16px; height: 16px; object-fit: contain;"></a>
                         <a class="social-link vine" href="#"></a>
                         <a class="social-link dribbble" href="#"></a>
-                        <a class="social-link instagram" href="#"></a>
+                        <a class="social-link instagram" href="#"><img src="insta-logo.avif" alt="Instagram" style="width: 16px; height: 16px; object-fit: contain;"></a>
     
                     </div>
                     <!-- social-container -->
@@ -189,7 +189,7 @@ $latestPosts = getPosts('published', 5);
                                 </figure> 
                                 
                                 <figure>
-                                	<a href="https://www.instagram.com/pixelwarsdesign/"><img src="imgdd.jpg" alt="About Me"></a>
+                                	<a href="https://www.instagram.com/pixelwarsdesign/"><img src="insta-logo.avif" alt="Follow On Instagram"></a>
                                     <figcaption class="wp-caption-text">Follow On Instagram</figcaption>
                                 </figure> 
                                 <!-- .link-boxes -->         
@@ -310,11 +310,11 @@ $latestPosts = getPosts('published', 5);
                 <div class="footer-social">
                 	
                     <div class="textwidget">
-                        <a class="social-link facebook" href="#"></a>
-                        <a class="social-link twitter" href="#"></a>
+                        <a class="social-link facebook" href="#"><img src="facebook-logo.jpeg" alt="Facebook" style="width: 20px; height: 20px; object-fit: contain; vertical-align: middle;"></a>
+                        <a class="social-link twitter" href="#"><img src="x-logo.jpg" alt="X (Twitter)" style="width: 20px; height: 20px; object-fit: contain; vertical-align: middle;"></a>
                         <a class="social-link vine" href="#"></a>
                         <a class="social-link dribbble" href="#"></a>
-                        <a class="social-link instagram" href="#"></a>
+                        <a class="social-link instagram" href="#"><img src="insta-logo.avif" alt="Instagram" style="width: 20px; height: 20px; object-fit: contain; vertical-align: middle;"></a>
                     </div>
                     
                 </div>
