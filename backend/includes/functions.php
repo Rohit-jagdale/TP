@@ -80,7 +80,7 @@ function requireLogin() {
 
 /**
  * Get all posts
- * @param string $status
+ * @param string|null $status - 'published', 'draft', or null for all posts
  * @param int $limit
  * @param int $offset
  * @return array
@@ -89,17 +89,32 @@ function getPosts($status = 'published', $limit = null, $offset = 0) {
     $pdo = getDBConnection();
     if (!$pdo) return [];
     
-    $sql = "SELECT * FROM posts WHERE status = :status ORDER BY created_at DESC";
-    if ($limit !== null) {
-        $sql .= " LIMIT :limit OFFSET :offset";
+    // If status is null, get all posts regardless of status
+    if ($status === null) {
+        $sql = "SELECT * FROM posts ORDER BY created_at DESC";
+        if ($limit !== null) {
+            $sql .= " LIMIT :limit OFFSET :offset";
+        }
+        
+        $stmt = $pdo->prepare($sql);
+        if ($limit !== null) {
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        }
+    } else {
+        $sql = "SELECT * FROM posts WHERE status = :status ORDER BY created_at DESC";
+        if ($limit !== null) {
+            $sql .= " LIMIT :limit OFFSET :offset";
+        }
+        
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':status', $status, PDO::PARAM_STR);
+        if ($limit !== null) {
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        }
     }
     
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':status', $status, PDO::PARAM_STR);
-    if ($limit !== null) {
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-    }
     $stmt->execute();
     
     return $stmt->fetchAll();

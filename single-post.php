@@ -32,7 +32,9 @@ $relatedPosts = array_filter($relatedPosts, function($p) use ($post) {
 $relatedPosts = array_slice($relatedPosts, 0, 3);
 
 $readTime = ceil(str_word_count(strip_tags($post['content'])) / 200);
-$featuredImage = !empty($post['featured_image']) ? $post['featured_image'] : 'post1.webp';
+$featuredImage = (!empty($post['featured_image']) && trim($post['featured_image']) !== '') 
+    ? trim($post['featured_image']) 
+    : 'post1.webp';
 ?>
 <!DOCTYPE html>
 <html data-wf-page="grungy-id" lang="en">
@@ -63,7 +65,9 @@ $featuredImage = !empty($post['featured_image']) ? $post['featured_image'] : 'po
                             <?php 
                             $recentPosts = getPosts('published', 6);
                             foreach ($recentPosts as $recentPost): 
-                                $recentPostImage = !empty($recentPost['featured_image']) ? $recentPost['featured_image'] : 'post1.webp';
+                                $recentPostImage = (!empty($recentPost['featured_image']) && trim($recentPost['featured_image']) !== '') 
+                                    ? trim($recentPost['featured_image']) 
+                                    : 'post1.webp';
                             ?>
                             <div role="listitem" class="w-dyn-item">
                                 <a href="single-post.php?slug=<?php echo escape($recentPost['slug']); ?>" class="moving-tech-item w-inline-block">
@@ -149,7 +153,9 @@ $featuredImage = !empty($post['featured_image']) ? $post['featured_image'] : 'po
                 <h2 class="related-posts-title">Related Posts</h2>
                 <div class="related-posts-grid">
                     <?php foreach ($relatedPosts as $relatedPost): 
-                        $relatedImage = !empty($relatedPost['featured_image']) ? $relatedPost['featured_image'] : 'post1.webp';
+                        $relatedImage = (!empty($relatedPost['featured_image']) && trim($relatedPost['featured_image']) !== '') 
+                            ? trim($relatedPost['featured_image']) 
+                            : 'post1.webp';
                     ?>
                     <div class="related-post-card">
                         <a href="single-post.php?slug=<?php echo escape($relatedPost['slug']); ?>" class="related-post-image-link">

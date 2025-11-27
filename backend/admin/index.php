@@ -12,13 +12,44 @@ if (!$pdo) {
     die('Database connection failed. Please check your database configuration.');
 }
 
+// Handle delete action
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
+    $id = $_GET['id'];
+    
+    // Get the post to retrieve the featured image path
+    $post = getPostById($id);
+    
+    if ($post) {
+        // Delete the associated image file if it exists
+        if (!empty($post['featured_image'])) {
+            $imagePath = dirname(dirname(__DIR__)) . '/' . $post['featured_image'];
+            if (file_exists($imagePath) && is_file($imagePath)) {
+                @unlink($imagePath);
+            }
+        }
+        
+        // Delete the post from database
+        $stmt = $pdo->prepare("DELETE FROM posts WHERE id = :id");
+        if ($stmt->execute([':id' => $id])) {
+            header('Location: index.php?deleted=1');
+            exit;
+        } else {
+            header('Location: index.php?error=1');
+            exit;
+        }
+    } else {
+        header('Location: index.php?error=1');
+        exit;
+    }
+}
+
 // Get statistics
 $totalPosts = $pdo->query("SELECT COUNT(*) FROM posts")->fetchColumn();
 $publishedPosts = $pdo->query("SELECT COUNT(*) FROM posts WHERE status = 'published'")->fetchColumn();
 $draftPosts = $pdo->query("SELECT COUNT(*) FROM posts WHERE status = 'draft'")->fetchColumn();
 $totalCategories = $pdo->query("SELECT COUNT(*) FROM categories")->fetchColumn();
 
-// Get recent posts
+// Get recent posts (all posts for admin)
 $recentPosts = getPosts(null, 5);
 ?>
 <!DOCTYPE html>
@@ -122,6 +153,9 @@ $recentPosts = getPosts(null, 5);
             font-weight: 600;
             color: #2c3e50;
         }
+        td {
+            color: #333;
+        }
         .status {
             padding: 4px 8px;
             border-radius: 4px;
@@ -140,9 +174,33 @@ $recentPosts = getPosts(null, 5);
             color: #3498db;
             text-decoration: none;
             margin-right: 10px;
+            font-weight: 500;
         }
         .actions a:hover {
             text-decoration: underline;
+        }
+        .actions a.delete {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+        .actions a.delete:hover {
+            color: #c0392b;
+            text-decoration: underline;
+        }
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
@@ -158,6 +216,13 @@ $recentPosts = getPosts(null, 5);
     </div>
     
     <div class="container">
+        <?php if (isset($_GET['deleted']) && $_GET['deleted'] == 1): ?>
+            <div class="message success">Post deleted successfully</div>
+        <?php endif; ?>
+        <?php if (isset($_GET['error']) && $_GET['error'] == 1): ?>
+            <div class="message error">Error deleting post</div>
+        <?php endif; ?>
+        
         <div class="stats">
             <div class="stat-card">
                 <h3>Total Posts</h3>
@@ -211,8 +276,9 @@ $recentPosts = getPosts(null, 5);
                                 <td><?php echo formatDate($post['created_at']); ?></td>
                                 <td class="actions">
                                     <a href="posts.php?action=edit&id=<?php echo $post['id']; ?>">Edit</a>
-                                    <a href="posts.php?action=delete&id=<?php echo $post['id']; ?>" 
-                                       onclick="return confirm('Are you sure?')">Delete</a>
+                                    <a href="index.php?action=delete&id=<?php echo $post['id']; ?>" 
+                                       class="delete"
+                                       onclick="return confirm('Are you sure you want to delete this post?')">Delete</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

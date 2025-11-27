@@ -20,12 +20,29 @@ if (isset($_GET['action'])) {
     $id = $_GET['id'] ?? null;
     
     if ($action === 'delete' && $id) {
-        $stmt = $pdo->prepare("DELETE FROM posts WHERE id = :id");
-        if ($stmt->execute([':id' => $id])) {
-            $message = 'Post deleted successfully';
-            $messageType = 'success';
+        // Get the post to retrieve the featured image path
+        $post = getPostById($id);
+        
+        if ($post) {
+            // Delete the associated image file if it exists
+            if (!empty($post['featured_image'])) {
+                $imagePath = dirname(dirname(__DIR__)) . '/' . $post['featured_image'];
+                if (file_exists($imagePath) && is_file($imagePath)) {
+                    @unlink($imagePath);
+                }
+            }
+            
+            // Delete the post from database
+            $stmt = $pdo->prepare("DELETE FROM posts WHERE id = :id");
+            if ($stmt->execute([':id' => $id])) {
+                $message = 'Post deleted successfully';
+                $messageType = 'success';
+            } else {
+                $message = 'Error deleting post';
+                $messageType = 'error';
+            }
         } else {
-            $message = 'Error deleting post';
+            $message = 'Post not found';
             $messageType = 'error';
         }
     }
@@ -44,22 +61,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $slug = slugify($title);
         
         // Handle file upload
-        $featuredImage = $_POST['existing_image'] ?? '';
+        // For new posts, start with null; for edits, use existing image if present
+        $featuredImage = !empty($_POST['existing_image']) ? $_POST['existing_image'] : null;
+        $oldImagePath = null;
+        
+        // If updating a post, get the old image path for potential deletion
+        if ($id) {
+            $existingPost = getPostById($id);
+            if ($existingPost && !empty($existingPost['featured_image'])) {
+                $oldImagePath = $existingPost['featured_image'];
+            }
+        }
+        
+        // Check if a new file is being uploaded
         if (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = dirname(dirname(__DIR__)) . '/uploads/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
             
-            $fileName = time() . '_' . basename($_FILES['featured_image']['name']);
-            $targetFile = $uploadDir . $fileName;
+            // Validate file type
+            $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            $fileType = $_FILES['featured_image']['type'];
             
-            if (move_uploaded_file($_FILES['featured_image']['tmp_name'], $targetFile)) {
-                $featuredImage = 'uploads/' . $fileName;
+            if (in_array($fileType, $allowedTypes)) {
+                $fileName = time() . '_' . basename($_FILES['featured_image']['name']);
+                $targetFile = $uploadDir . $fileName;
+                
+                if (move_uploaded_file($_FILES['featured_image']['tmp_name'], $targetFile)) {
+                    // Verify the file was actually saved
+                    if (file_exists($targetFile)) {
+                        $featuredImage = 'uploads/' . $fileName;
+                        
+                        // Delete the old image if a new one was successfully uploaded
+                        if ($oldImagePath && $oldImagePath !== $featuredImage) {
+                            $oldImageFullPath = dirname(dirname(__DIR__)) . '/' . $oldImagePath;
+                            if (file_exists($oldImageFullPath) && is_file($oldImageFullPath)) {
+                                @unlink($oldImageFullPath);
+                            }
+                        }
+                    } else {
+                        $message = 'Error: Image file was not saved correctly.';
+                        $messageType = 'error';
+                    }
+                } else {
+                    $message = 'Error: Failed to upload image file. Please check file permissions.';
+                    $messageType = 'error';
+                }
+            } else {
+                $message = 'Error: Invalid file type. Please upload an image (JPEG, PNG, GIF, or WebP).';
+                $messageType = 'error';
             }
+        } elseif (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+            // Handle upload errors
+            $uploadErrors = [
+                UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive.',
+                UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive.',
+                UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded.',
+                UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
+                UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
+                UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.'
+            ];
+            $errorCode = $_FILES['featured_image']['error'];
+            $message = 'Error uploading image: ' . ($uploadErrors[$errorCode] ?? 'Unknown error');
+            $messageType = 'error';
         }
         
-        if ($id) {
+        // Only proceed if no upload error occurred
+        if (!isset($message) || $messageType !== 'error') {
+            if ($id) {
             // Update existing post
             $stmt = $pdo->prepare("
                 UPDATE posts 
@@ -109,9 +179,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             $message = 'Post created successfully';
-        }
-        
-        $messageType = 'success';
+            }
+            
+            $messageType = 'success';
+        } // End of "no upload error" check
     } else {
         $message = 'Please fill in all required fields';
         $messageType = 'error';

@@ -60,7 +60,9 @@ $categories = getCategories();
                                 <?php 
                                 $recentPosts = getPosts('published', 6);
                                 foreach ($recentPosts as $recentPost): 
-                                    $featuredImage = !empty($recentPost['featured_image']) ? $recentPost['featured_image'] : 'post1.webp';
+                                    $featuredImage = (!empty($recentPost['featured_image']) && trim($recentPost['featured_image']) !== '') 
+                                        ? trim($recentPost['featured_image']) 
+                                        : 'post1.webp';
                                 ?>
                                 <div role="listitem" class="w-dyn-item">
                                     <a href="single-post.php?slug=<?php echo escape($recentPost['slug']); ?>" class="moving-tech-item w-inline-block">
@@ -105,7 +107,9 @@ $categories = getCategories();
                         <?php else: ?>
                             <?php foreach ($posts as $post): 
                                 $postDate = new DateTime($post['created_at']);
-                                $featuredImage = !empty($post['featured_image']) ? $post['featured_image'] : 'post1.webp';
+                                $featuredImage = (!empty($post['featured_image']) && trim($post['featured_image']) !== '') 
+                                    ? trim($post['featured_image']) 
+                                    : 'post1.webp';
                                 $postCategories = getPostCategories($post['id']);
                                 $primaryCategory = !empty($postCategories) ? $postCategories[0] : null;
                                 $readTime = ceil(str_word_count(strip_tags($post['content'])) / 200); // Approximate reading time
